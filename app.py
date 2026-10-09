@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 from decimal import Decimal
 
-st.set_page_config(page_title="Mizan - ميزان", page_icon="⚖️", layout="wide")
-st.markdown("<h1 style='text-align:center'>⚖️ ميزان | Mizan</h1><p style='text-align:center'>فكرة وتطوير: جنى محمود - ميزانك يظبط في ثانية</p>", unsafe_allow_html=True)
+st.set_page_config(page_title="Mizan", page_icon="balance", layout="wide")
+
+st.title("Mizan - Balance Checker")
+st.write("Developed by Jana Mahmoud - Mizanak Yezbot fi Sanya")
 
 def to_dec(v):
     try:
@@ -16,32 +18,40 @@ def to_dec(v):
     except:
         return None
 
-st.sidebar.title("القائمة")
-menu = st.sidebar.radio("اختاري", ["الرئيسية", "فحص الملف"])
+menu = st.sidebar.radio("Menu", ["Home", "Check File"])
 
-if menu == "الرئيسية":
-    st.success("مرحبا بك في مشروع ميزان")
-    st.info("ادخلي على 'فحص الملف' وارفعي ملف Excel")
+if menu == "Home":
+    st.success("Welcome to Mizan - First Egyptian Trial Balance Checker")
+    st.info("Go to Check File to upload Excel")
 else:
-    f = st.file_uploader("اختاري ملف Excel", type=["xlsx", "xls"])
+    f = st.file_uploader("Upload Excel", type=["xlsx", "xls"])
     if f is not None:
         df = pd.read_excel(f)
         st.session_state["df"] = df
         st.dataframe(df.head(10), use_container_width=True)
+
     if "df" in st.session_state:
         df = st.session_state["df"]
-        cols = ["-- اختاري --"] + list(df.columns)
-        dcol = st.selectbox("عمود المدين", cols)
-        ccol = st.selectbox("عمود الدائن", cols)
-        if st.button("ابدأ الفحص 🔍", type="primary"):
-            if not dcol.startswith("--") and not ccol.startswith("--"):
-                td = sum([to_dec(x) or Decimal(0) for x in df[dcol]])
-                tc = sum([to_dec(x) or Decimal(0) for x in df[ccol]])
-                st.metric("اجمالي المدين", float(td))
-                st.metric("اجمالي الدائن", float(tc))
-                st.metric("الفرق", float(abs(td-tc)))
-                if abs(td-tc) > Decimal("0.01"):
-                    st.error("الميزان غير متوازن")
+        cols = ["--"] + list(df.columns)
+        dcol = st.selectbox("Debit Column", cols, key="d")
+        ccol = st.selectbox("Credit Column", cols, key="c")
+        if st.button("Start Check", type="primary"):
+            if dcol!= "--" and ccol!= "--":
+                td = Decimal(0)
+                tc = Decimal(0)
+                for _, r in df.iterrows():
+                    dv = to_dec(r[dcol])
+                    cv = to_dec(r[ccol])
+                    if dv is not None:
+                        td += dv
+                    if cv is not None:
+                        tc += cv
+                diff = abs(td - tc)
+                st.metric("Total Debit", float(td))
+                st.metric("Total Credit", float(tc))
+                st.metric("Difference", float(diff))
+                if diff > Decimal("0.01"):
+                    st.error("Not Balanced")
                 else:
-                    st.success("الميزان متوازن ✅")
+                    st.success("Balanced - OK")
                     st.balloons()
