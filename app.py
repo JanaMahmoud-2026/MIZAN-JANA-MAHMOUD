@@ -6,7 +6,37 @@ st.set_page_config(page_title="Mizan", page_icon="balance", layout="wide")
 
 st.title("Mizan - Balance Checker")
 st.write("Developed by Jana Mahmoud - Mizanak Yezbot fi Sanya")
-
+with st.expander("📖 How to use / طريقة الاستخدام - اضغط هنا"):
+    tab_ar, tab_en = st.tabs(["🇪🇬 العربية", "🇺🇸 English"])
+    with tab_ar:
+        st.markdown("""
+        **أهلاً بيك في ميزان - ميزانك يزبط في ثانية!**
+        
+        **1. جهز ملف الاكسيل:**
+        - لازم يكون فيه عمود **مدين (Debit)** وعمود **دائن (Credit)**
+        
+        **2. ارفع الملف:**
+        - دوس على زرار Upload واختار ملفك
+        
+        **3. شوف النتيجة:**
+        - لو متوازن ✅ هيقولك الميزان مظبوط
+        - لو مش متوازن ❌ هيطلعلك الفرق كام بالظبط
+        """)
+    with tab_en:
+        st.markdown("""
+        **Welcome to Mizan - Your Balance in a Second!**
+        
+        **1. Prepare your Excel:**
+        - Must have **Debit** and **Credit** columns
+        
+        **2. Upload:**
+        - Click Upload and choose your file
+        
+        **3. Get result:**
+        - Balanced ✅: Correct!
+        - Not Balanced ❌: Shows difference
+        """)
+        
 def to_dec(v):
     try:
         if pd.isna(v):
